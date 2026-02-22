@@ -1,4 +1,4 @@
-const CACHE_NAME = 'calculadora-v2.1.0-wasm';
+const CACHE_NAME = 'calculadora-v2.6-jsexport';
 const ASSETS_TO_CACHE = [
   '/habemus/',
   '/habemus/index.html',
