@@ -34,6 +34,9 @@ kotlin {
             }
         }
         binaries.executable()
+        compilerOptions {
+            allWarningsAsErrors.set(false)
+        }
     }
     
     sourceSets {
