@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Calculadora 714 - Distribuidor de Bebidas Habemus Bar">
     <meta name="theme-color" content="#003D99">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>Calculadora 714</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -20,33 +21,61 @@
         }
         .loader {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 20px;
             width: 100vw;
             height: 100vh;
             background: linear-gradient(135deg, #003D99, #0066cc);
             color: white;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 600;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <div id="root">
-        <div class="loader">Cargando Calculadora...</div>
+        <div class="loader">
+            <div class="spinner"></div>
+            <div>Cargando Calculadora...</div>
+        </div>
     </div>
     <script defer src="calculadora.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                if (typeof globalThis.composeApp?.main === 'function') {
-                    globalThis.composeApp.main();
-                    console.log('✅ App initialized');
-                } else {
-                    console.log('⚠️ App not ready yet');
+        // Log when calculadora.js loads
+        console.log('📦 calculadora.js deferred load initiated');
+        
+        // Check periodically if Compose app is ready
+        let checkCount = 0;
+        const checkInterval = setInterval(() => {
+            checkCount++;
+            const rootDiv = document.getElementById('root');
+            const hasChildren = rootDiv && rootDiv.children.length > 1;
+            
+            if (hasChildren) {
+                console.log('✅ App rendered after', checkCount * 100, 'ms');
+                clearInterval(checkInterval);
+            } else if (checkCount > 50) { // Timeout after 5 seconds
+                console.error('❌ App failed to initialize after 5 seconds');
+                if (rootDiv) {
+                    rootDiv.innerHTML = '<div class="loader">Error cargando aplicación</div>';
                 }
-            }, 500);
-        });
+                clearInterval(checkInterval);
+            }
+        }, 100);
     </script>
 </body>
 </html>
+
