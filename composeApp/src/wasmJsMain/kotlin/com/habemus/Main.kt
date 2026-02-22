@@ -46,6 +46,12 @@ object WasmApp {
     }
 }
 
+// Force initialization by accessing the object
+fun main() {
+    // Access WasmApp to trigger its init block
+    WasmApp
+}
+
 
 
 
