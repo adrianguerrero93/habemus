@@ -1,8 +1,17 @@
 package com.habemus
 
-// Entry point - app will auto-initialize when loaded
-fun onPageReady() {
-    // Placeholder
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.window.ComposeViewport
+import kotlinx.browser.document
+
+@OptIn(ExperimentalComposeUiApi::class)
+fun main() {
+    val root = document.getElementById("root") ?: return
+    ComposeViewport(viewportContainer = root) {
+        AppWithViewModel()
+    }
 }
+
+
 
 
