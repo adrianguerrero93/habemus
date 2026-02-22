@@ -9,25 +9,33 @@ external object console {
     fun log(message: String)
 }
 
+// This code runs when the module loads
+fun main() {
+    console.log("🔥 WASM main() entry point")
+    
+    window.setTimeout({
+        initApp()
+        null
+    }, 100)
+}
+
 @OptIn(ExperimentalComposeUiApi::class)
-fun initializeCalculadora() {
-    console.log("🔥 initializeCalculadora() called!")
+private fun initApp() {
+    console.log("⏱️ initApp() called")
+    val root = document.getElementById("root") ?: run {
+        console.log("❌ root not found")
+        return
+    }
     
-    val root = document.getElementById("root")
-    console.log("📍 Root element found: ${root != null}")
-    
-    if (root != null) {
-        try {
-            console.log("🎨 Creating ComposeViewport...")
-            // Clear loader
-            root.innerHTML = ""
-            ComposeViewport(viewportContainer = root) {
-                AppWithViewModel()
-            }
-            console.log("✅ App rendered!")
-        } catch (e: Throwable) {
-            console.log("❌ Error: ${e.message}")
+    try {
+        console.log("🎨 Creating ComposeViewport...")
+        root.innerHTML = ""
+        ComposeViewport(viewportContainer = root) {
+            AppWithViewModel()
         }
+        console.log("✅ App rendered!")
+    } catch (e: Throwable) {
+        console.log("❌ Error: ${e.message}")
     }
 }
 

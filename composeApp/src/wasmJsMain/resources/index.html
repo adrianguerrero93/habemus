@@ -55,45 +55,13 @@
         <div class="loader">
             <div class="spinner"></div>
             <div>Inicializando Calculadora 714...</div>
-            <div class="version">v2.4 - Exported init</div>
+            <div class="version">v2.5 - main() entry</div>
         </div>
     </div>
     <script defer src="calculadora.js"></script>
-    <script defer>
-        console.log('📝 HTML loaded, waiting for WASM module...');
-        
-        let attempts = 0;
-        const checkModule = setInterval(() => {
-            attempts++;
-            console.log(`[${attempts}] Checking for Kotlin exports...`);
-            
-            // Try to find the exported function
-            if (globalThis.Habemus_habemus_Main_initializeCalculadora && 
-                typeof globalThis.Habemus_habemus_Main_initializeCalculadora === 'function') {
-                clearInterval(checkModule);
-                console.log('✅ Found initializeCalculadora, calling it...');
-                globalThis.Habemus_habemus_Main_initializeCalculadora();
-            } 
-            // Also try simple names
-            else if (globalThis.initializeCalculadora && 
-                     typeof globalThis.initializeCalculadora === 'function') {
-                clearInterval(checkModule);
-                console.log('✅ Found initializeCalculadora (simple), calling it...');
-                globalThis.initializeCalculadora();
-            }
-            // Check all global properties
-            else if (attempts === 1) {
-                console.log('Available globals:', Object.keys(globalThis).filter(k => !k.startsWith('webkit')).slice(0, 20));
-            }
-            
-            if (attempts > 50) {
-                clearInterval(checkModule);
-                console.error('❌ Timeout: Could not find initializeCalculadora');
-            }
-        }, 100);
-    </script>
 </body>
 </html>
+
 
 
 
