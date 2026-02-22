@@ -4,14 +4,15 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import kotlinx.browser.document
 import kotlinx.browser.window
+import kotlin.js.JsExport
 
 external object console {
     fun log(message: String)
 }
 
-// This code runs when the module loads
-fun main() {
-    console.log("🔥 WASM main() entry point")
+@JsExport
+fun startApp() {
+    console.log("🔥 startApp() called!")
     
     window.setTimeout({
         initApp()
