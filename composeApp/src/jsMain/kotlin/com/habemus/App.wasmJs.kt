@@ -13,10 +13,45 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.math.roundToInt
 
+external fun encodeURIComponent(uri: String): String
+
+@JsName("open")
+external fun windowOpen(url: String, target: String)
+
 fun formatPrice(value: Double): String {
     return (value * 100).toInt().let { cents ->
         "${cents / 100}.${(cents % 100).toString().padStart(2, '0')}"
     }
+}
+
+fun generateOrderSummary(cartItems: List<CartItem>, isRetail: Boolean): String {
+    if (cartItems.isEmpty()) return "Carrito vacío"
+    
+    val lines = mutableListOf<String>()
+    var total = 0.0
+    
+    cartItems.forEach { item ->
+        val price = if (isRetail) item.product.priceRetail else item.product.priceCommerce
+        val subtotal = price * item.quantity
+        total += subtotal
+        
+        val productName = item.product.name
+            .replace("LATA BAUM ", "")
+            .replace(" 473 CC", "")
+        
+        lines.add("${productName}: \$${formatPrice(price)} × ${item.quantity} = \$${formatPrice(subtotal)}")
+    }
+    
+    lines.add("")
+    lines.add("Total: \$${formatPrice(total)}")
+    
+    return lines.joinToString("\n")
+}
+
+fun shareToWhatsApp(text: String) {
+    val encodedText = encodeURIComponent(text)
+    val whatsappUrl = "https://wa.me/?text=$encodedText"
+    windowOpen(whatsappUrl, "_blank")
 }
 
 data class Product(
@@ -162,11 +197,27 @@ fun AppWithViewModel() {
                             Text("Items: $itemCount", color = Color.White, fontSize = 16.sp)
                             Text("Total: \$${formatPrice(total)}", color = Color.White, fontSize = 18.sp)
                         }
-                        Button(
-                            onClick = { cart.value = emptyMap() },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF6B6B))
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Text("Limpiar", color = Color.White)
+                            if (cart.value.isNotEmpty()) {
+                                Button(
+                                    onClick = {
+                                        val cartList = cart.value.values.sortedBy { it.product.name }
+                                        val summary = generateOrderSummary(cartList, isRetail.value)
+                                        shareToWhatsApp(summary)
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF25D366))
+                                ) {
+                                    Text("Compartir", color = Color.White)
+                                }
+                            }
+                            Button(
+                                onClick = { cart.value = emptyMap() },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF6B6B))
+                            ) {
+                                Text("Limpiar", color = Color.White)
+                            }
                         }
                     }
                 }
