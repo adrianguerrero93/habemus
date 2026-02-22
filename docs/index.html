@@ -55,42 +55,29 @@
         <div class="loader">
             <div class="spinner"></div>
             <div>Inicializando Calculadora 714...</div>
-            <div class="version">v4.1 - globalThis webpack path</div>
+            <div class="version">v4.2 - Fixed webpack setup</div>
         </div>
     </div>
-    <script type="module">
-        console.log('[inline] Setting webpack publicPath');
+    <script>
+        console.log('[setup] Setting webpack public path');
+        // Set before loading webpack bundle
+        window.__webpack_public_path__ = '/habemus/';
+    </script>
+    <script defer src="calculadora.js"></script>
+    <script defer>
+        console.log('[app] WASM bundle loaded');
         
-        // Set webpack public path before loading module
-        globalThis.__webpack_public_path__ = '/habemus/';
-        
-        console.log('[inline] Loading WASM module');
-        
-        import('./calculadora.js').then((module) => {
-            console.log('[inline] WASM loaded, module keys:', Object.keys(module).slice(0, 5));
-            
-            // Force Kotlin initialization by calling _initialize
-            if (typeof module._initialize === 'function') {
-                console.log('🔥 Calling module._initialize()');
-                module._initialize();
+        // Wait for webpack and Kotlin to initialize
+        setTimeout(() => {
+            console.log('[app] Checking for initializeCompose...');
+            if (typeof window.initializeCompose === 'function') {
+                console.log('✅ Found initializeCompose, calling it');
+                window.initializeCompose();
+            } else {
+                console.log('⚠️ initializeCompose not found');
+                console.log('[app] window keys:', Object.keys(window).filter(k => !k.startsWith('webkit')).slice(0, 20));
             }
-            
-            // Wait for Kotlin code to assign initializeCompose
-            setTimeout(() => {
-                if (typeof window.initializeCompose === 'function') {
-                    console.log('✅ Found initializeCompose, calling it');
-                    window.initializeCompose();
-                } else if (typeof globalThis.initializeCompose === 'function') {
-                    console.log('✅ Found globalThis.initializeCompose, calling it');
-                    globalThis.initializeCompose();
-                } else {
-                    console.log('⚠️ initializeCompose not found');
-                    console.log('window.initializeCompose:', typeof window.initializeCompose);
-                }
-            }, 500);
-        }).catch(err => {
-            console.error('[inline] Load error:', err);
-        });
+        }, 500);
     </script>
 </body>
 </html>
