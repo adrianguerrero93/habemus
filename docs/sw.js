@@ -1,4 +1,4 @@
-const CACHE_NAME = 'calculadora-v1.0.0';
+const CACHE_NAME = 'calculadora-v2.1.0-wasm';
 const ASSETS_TO_CACHE = [
   '/habemus/',
   '/habemus/index.html',
@@ -69,3 +69,4 @@ self.addEventListener('fetch', event => {
       })
   );
 });
+
