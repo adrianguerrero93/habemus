@@ -200,17 +200,19 @@ fun AppWithViewModel() {
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            if (cart.value.isNotEmpty()) {
-                                Button(
-                                    onClick = {
-                                        val cartList = cart.value.values.sortedBy { it.product.name }
-                                        val summary = generateOrderSummary(cartList, isRetail.value)
-                                        shareToWhatsApp(summary)
-                                    },
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF25D366))
-                                ) {
-                                    Text("Compartir", color = Color.White)
-                                }
+                            Button(
+                                onClick = {
+                                    val cartList = cart.value.values.sortedBy { it.product.name }
+                                    val summary = generateOrderSummary(cartList, isRetail.value)
+                                    shareToWhatsApp(summary)
+                                },
+                                enabled = cart.value.isNotEmpty(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF25D366),
+                                    disabledContainerColor = Color(0xFFCCCCCC)
+                                )
+                            ) {
+                                Text("Compartir", color = Color.White)
                             }
                             Button(
                                 onClick = { cart.value = emptyMap() },
