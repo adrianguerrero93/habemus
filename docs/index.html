@@ -55,29 +55,46 @@
         <div class="loader">
             <div class="spinner"></div>
             <div>Inicializando Calculadora 714...</div>
-            <div class="version">v4.2 - Fixed webpack setup</div>
+            <div class="version">v4.3 - Direct function call loop</div>
         </div>
     </div>
     <script>
         console.log('[setup] Setting webpack public path');
-        // Set before loading webpack bundle
         window.__webpack_public_path__ = '/habemus/';
     </script>
     <script defer src="calculadora.js"></script>
     <script defer>
-        console.log('[app] WASM bundle loaded');
+        console.log('[app] WASM bundle loaded, starting init loop');
         
-        // Wait for webpack and Kotlin to initialize
-        setTimeout(() => {
-            console.log('[app] Checking for initializeCompose...');
+        let attempts = 0;
+        const tryInit = setInterval(() => {
+            attempts++;
+            
+            // Try to call initializeCompose if it exists
             if (typeof window.initializeCompose === 'function') {
-                console.log('✅ Found initializeCompose, calling it');
+                clearInterval(tryInit);
+                console.log('✅ Found initializeCompose at attempt', attempts);
                 window.initializeCompose();
-            } else {
-                console.log('⚠️ initializeCompose not found');
-                console.log('[app] window keys:', Object.keys(window).filter(k => !k.startsWith('webkit')).slice(0, 20));
+                return;
             }
-        }, 500);
+            
+            // Also try the long path
+            if (window.com?.habemus?.initializeCompose) {
+                clearInterval(tryInit);
+                console.log('✅ Found via com.habemus at attempt', attempts);
+                window.com.habemus.initializeCompose();
+                return;
+            }
+            
+            if (attempts === 1) {
+                console.log('[app] Waiting for initializeCompose...');
+            }
+            
+            if (attempts > 100) { // 10 seconds
+                clearInterval(tryInit);
+                console.error('❌ Timeout: initializeCompose not found');
+            }
+        }, 100);
     </script>
 </body>
 </html>

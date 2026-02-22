@@ -11,7 +11,7 @@ external object console {
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun initializeCompose() {
-    console.log("🔥 initializeCompose() CALLED from globalThis")
+    console.log("🔥 initializeCompose() CALLED")
     val root = document.getElementById("root") ?: run {
         console.log("❌ root not found")
         return
@@ -28,17 +28,6 @@ fun initializeCompose() {
         console.log("❌ Error: ${e.message}")
     }
 }
-
-// Expose to globalThis
-internal fun exposeInit() {
-    js("""
-        globalThis.initializeCompose = function() { com.habemus.initializeCompose(); };
-        console.log('🔥 Assigned initializeCompose to globalThis');
-    """)
-}
-
-// Call it when module loads - accessed at package level
-val _init = run { exposeInit(); null }
 
 
 
