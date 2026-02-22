@@ -4,16 +4,14 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import kotlinx.browser.document
 import kotlinx.browser.window
-import kotlin.js.JsExport
 
 external object console {
     fun log(message: String)
 }
 
-@JsExport
 @OptIn(ExperimentalComposeUiApi::class)
 fun initializeCompose() {
-    console.log("🔥 initializeCompose() EXPORTED and CALLED")
+    console.log("🔥 initializeCompose() CALLED from globalThis")
     val root = document.getElementById("root") ?: run {
         console.log("❌ root not found")
         return
@@ -30,6 +28,18 @@ fun initializeCompose() {
         console.log("❌ Error: ${e.message}")
     }
 }
+
+// Expose to globalThis
+internal fun exposeInit() {
+    js("""
+        globalThis.initializeCompose = function() { com.habemus.initializeCompose(); };
+        console.log('🔥 Assigned initializeCompose to globalThis');
+    """)
+}
+
+// Call it when module loads - accessed at package level
+val _init = run { exposeInit(); null }
+
 
 
 
