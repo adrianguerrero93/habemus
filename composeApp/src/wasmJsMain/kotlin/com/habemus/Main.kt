@@ -29,6 +29,9 @@ fun initializeCompose() {
     }
 }
 
+// Module-level initialization via js()
+val _init: String = js("(window.initializeCompose = () => com.habemus.initializeCompose(), console.log('Module loaded'), 'ok')")
+
 
 
 

@@ -55,44 +55,69 @@
         <div class="loader">
             <div class="spinner"></div>
             <div>Inicializando Calculadora 714...</div>
-            <div class="version">v4.3 - Direct function call loop</div>
+            <div class="version">v4.4 - Search module for Kotlin function</div>
         </div>
     </div>
     <script>
         console.log('[setup] Setting webpack public path');
         window.__webpack_public_path__ = '/habemus/';
+        window.kotlinInit = null;
     </script>
     <script defer src="calculadora.js"></script>
     <script defer>
-        console.log('[app] WASM bundle loaded, starting init loop');
+        console.log('[app] WASM bundle loaded');
         
+        // The composeApp object is the UMD export
+        if (typeof window.composeApp === 'object') {
+            console.log('[app] Found composeApp object');
+            
+            // Search for initializeCompose in the module
+            const searchForInit = (obj, depth = 0) => {
+                if (depth > 5) return null;
+                if (!obj || typeof obj !== 'object') return null;
+                
+                for (const key in obj) {
+                    if (typeof obj[key] === 'function' && key.includes('initialize')) {
+                        return obj[key];
+                    }
+                    const found = searchForInit(obj[key], depth + 1);
+                    if (found) return found;
+                }
+                return null;
+            };
+            
+            const initFn = searchForInit(window.composeApp);
+            if (initFn) {
+                console.log('✅ Found init function in module');
+                window.kotlinInit = initFn;
+            } else {
+                console.log('⚠️ No init function found');
+                console.log('[app] composeApp keys:', Object.keys(window.composeApp).slice(0, 10));
+            }
+        }
+        
+        // Also check for global Kotlin functions
         let attempts = 0;
         const tryInit = setInterval(() => {
             attempts++;
             
-            // Try to call initializeCompose if it exists
+            if (window.kotlinInit) {
+                clearInterval(tryInit);
+                console.log('✅ Calling kotlinInit');
+                window.kotlinInit();
+                return;
+            }
+            
             if (typeof window.initializeCompose === 'function') {
                 clearInterval(tryInit);
-                console.log('✅ Found initializeCompose at attempt', attempts);
+                console.log('✅ Found initializeCompose, calling it');
                 window.initializeCompose();
                 return;
             }
             
-            // Also try the long path
-            if (window.com?.habemus?.initializeCompose) {
-                clearInterval(tryInit);
-                console.log('✅ Found via com.habemus at attempt', attempts);
-                window.com.habemus.initializeCompose();
-                return;
-            }
-            
-            if (attempts === 1) {
-                console.log('[app] Waiting for initializeCompose...');
-            }
-            
             if (attempts > 100) { // 10 seconds
                 clearInterval(tryInit);
-                console.error('❌ Timeout: initializeCompose not found');
+                console.error('❌ Timeout');
             }
         }, 100);
     </script>
