@@ -55,10 +55,54 @@
         <div class="loader">
             <div class="spinner"></div>
             <div>Inicializando Calculadora 714...</div>
-            <div class="version">v2.7 - module-level init</div>
+            <div class="version">v2.9 - JsExport function</div>
         </div>
     </div>
     <script defer src="calculadora.js"></script>
+    <script defer>
+        console.log('📝 HTML loaded, attempting to call initializeApp...');
+        
+        let attempts = 0;
+        const maxAttempts = 100; // 10 seconds
+        
+        const tryInit = setInterval(() => {
+            attempts++;
+            
+            // Look for the exported initializeApp function
+            // UMD bundles export to globalThis.com.habemus.initializeApp
+            if (globalThis.com?.habemus?.initializeApp) {
+                clearInterval(tryInit);
+                console.log('✅ Found initializeApp, calling it...');
+                try {
+                    globalThis.com.habemus.initializeApp();
+                } catch (e) {
+                    console.error('❌ Error calling initializeApp:', e);
+                }
+                return;
+            }
+            
+            // First attempt: log what we found
+            if (attempts === 1) {
+                console.log('Searching globalThis for exports...');
+                const keys = Object.keys(globalThis)
+                    .filter(k => !k.startsWith('webkit') && k.length < 20)
+                    .slice(0, 30);
+                console.log('Available keys:', keys);
+            }
+            
+            // Check if we can access the composeApp bundle itself
+            if (attempts === 5 && globalThis.composeApp) {
+                console.log('composeApp found:', typeof globalThis.composeApp);
+                console.log('composeApp keys:', Object.keys(globalThis.composeApp).slice(0, 10));
+            }
+            
+            if (attempts >= maxAttempts) {
+                clearInterval(tryInit);
+                console.error('❌ Timeout: Could not find initializeApp after 10 seconds');
+                console.log('Final check - globalThis.com:', globalThis.com);
+            }
+        }, 100);
+    </script>
 </body>
 </html>
 

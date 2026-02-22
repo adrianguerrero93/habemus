@@ -4,29 +4,25 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import kotlinx.browser.document
 import kotlinx.browser.window
+import kotlin.js.JsExport
 
 external object console {
     fun log(message: String)
 }
 
-class Calculadora {
-    companion object {
-        init {
-            console.log("🔥 Calculadora companion object initialized")
-            window.setTimeout({
-                initApp()
-                null
-            }, 100)
-        }
-    }
+@JsExport
+fun initializeApp() {
+    console.log("🔥 initializeApp() called from JavaScript")
+    
+    window.setTimeout({
+        setupCompose()
+        null
+    }, 100)
 }
 
-// Force initialization by creating an instance
-val app = Calculadora()
-
 @OptIn(ExperimentalComposeUiApi::class)
-private fun initApp() {
-    console.log("⏱️ initApp() called")
+private fun setupCompose() {
+    console.log("⏱️ setupCompose() called")
     val root = document.getElementById("root") ?: run {
         console.log("❌ root not found")
         return
