@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Calculadora 714 - Distribuidor de Bebidas Habemus Bar">
     <meta name="theme-color" content="#003D99">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>Calculadora 714</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -20,33 +21,74 @@
         }
         .loader {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 20px;
             width: 100vw;
             height: 100vh;
             background: linear-gradient(135deg, #003D99, #0066cc);
             color: white;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 600;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .version {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <div id="root">
-        <div class="loader">Cargando Calculadora...</div>
+        <div class="loader">
+            <div class="spinner"></div>
+            <div>Inicializando Calculadora 714...</div>
+            <div class="version">v2.1 - WASM</div>
+        </div>
     </div>
-    <script defer src="calculadora.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                if (typeof globalThis.composeApp?.main === 'function') {
-                    globalThis.composeApp.main();
-                    console.log('✅ App initialized');
+        console.log('📝 index.html loaded, waiting for calculadora.js...');
+    </script>
+    <script defer src="calculadora.js"></script>
+    <script defer>
+        console.log('📦 Script tag with defer executed, checking for composeApp...');
+        
+        // When calculadora.js loads, it sets globalThis.composeApp
+        // We need to wait for that AND call onWasmLoaded
+        let checkCount = 0;
+        const initCheck = setInterval(() => {
+            checkCount++;
+            console.log(`⏳ Check #${checkCount}: globalThis.composeApp = ${typeof globalThis.composeApp}`);
+            
+            if (globalThis.composeApp) {
+                clearInterval(initCheck);
+                console.log('✅ composeApp loaded, calling onWasmLoaded()...');
+                if (typeof globalThis.composeApp.onWasmLoaded === 'function') {
+                    globalThis.composeApp.onWasmLoaded();
                 } else {
-                    console.log('⚠️ App not ready yet');
+                    console.warn('⚠️ onWasmLoaded not found in composeApp');
+                    console.log('📋 Available exports:', Object.keys(globalThis.composeApp));
                 }
-            }, 500);
-        });
+            } else if (checkCount > 100) {
+                clearInterval(initCheck);
+                console.error('❌ Timeout waiting for composeApp (10 seconds)');
+            }
+        }, 100);
     </script>
 </body>
 </html>
+
+
+
