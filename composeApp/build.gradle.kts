@@ -1,5 +1,6 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,6 +9,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
 }
 
+@OptIn(ExperimentalWasmDsl::class)
 kotlin {
     androidTarget {
         compilerOptions {
@@ -23,6 +25,15 @@ kotlin {
             baseName = "ComposeApp"
             isStatic = true
         }
+    }
+    
+    wasmJs {
+        browser {
+            commonWebpackConfig {
+                outputFileName = "calculadora.js"
+            }
+        }
+        binaries.executable()
     }
     
     sourceSets {
