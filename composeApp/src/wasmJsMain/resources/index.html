@@ -52,30 +52,36 @@
             <div>Cargando Calculadora...</div>
         </div>
     </div>
-    <script defer src="calculadora.js"></script>
     <script>
-        // Log when calculadora.js loads
-        console.log('📦 calculadora.js deferred load initiated');
+        console.log('📝 index.html loaded, waiting for calculadora.js...');
+    </script>
+    <script defer src="calculadora.js"></script>
+    <script defer>
+        console.log('📦 Script tag with defer executed, checking for composeApp...');
         
-        // Check periodically if Compose app is ready
+        // When calculadora.js loads, it sets globalThis.composeApp
+        // We need to wait for that AND call onWasmLoaded
         let checkCount = 0;
-        const checkInterval = setInterval(() => {
+        const initCheck = setInterval(() => {
             checkCount++;
-            const rootDiv = document.getElementById('root');
-            const hasChildren = rootDiv && rootDiv.children.length > 1;
+            console.log(`⏳ Check #${checkCount}: globalThis.composeApp = ${typeof globalThis.composeApp}`);
             
-            if (hasChildren) {
-                console.log('✅ App rendered after', checkCount * 100, 'ms');
-                clearInterval(checkInterval);
-            } else if (checkCount > 50) { // Timeout after 5 seconds
-                console.error('❌ App failed to initialize after 5 seconds');
-                if (rootDiv) {
-                    rootDiv.innerHTML = '<div class="loader">Error cargando aplicación</div>';
+            if (globalThis.composeApp) {
+                clearInterval(initCheck);
+                console.log('✅ composeApp loaded, calling onWasmLoaded()...');
+                if (typeof globalThis.composeApp.onWasmLoaded === 'function') {
+                    globalThis.composeApp.onWasmLoaded();
+                } else {
+                    console.warn('⚠️ onWasmLoaded not found in composeApp');
+                    console.log('📋 Available exports:', Object.keys(globalThis.composeApp));
                 }
-                clearInterval(checkInterval);
+            } else if (checkCount > 100) {
+                clearInterval(initCheck);
+                console.error('❌ Timeout waiting for composeApp (10 seconds)');
             }
         }, 100);
     </script>
 </body>
 </html>
+
 

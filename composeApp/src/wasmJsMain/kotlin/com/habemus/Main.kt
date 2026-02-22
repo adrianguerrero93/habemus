@@ -9,9 +9,10 @@ external object console {
     fun log(message: String)
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
-fun main() {
-    console.log("🔥 main() called by WASM runtime")
+// This function will be called by the WASM runtime automatically on module load
+// But we also export it so HTML can call it manually if needed
+fun onWasmLoaded() {
+    console.log("🔥 onWasmLoaded() called by WASM runtime")
     
     // Check if root exists immediately
     val rootImmediate = document.getElementById("root")
@@ -48,6 +49,8 @@ private fun initializeApp() {
         console.log("❌ Cannot initialize: root element not found")
     }
 }
+
+// No main() function - let WASM auto-initialize
 
 
 
