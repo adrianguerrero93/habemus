@@ -12,6 +12,22 @@ fun main() {
     }
 }
 
+// This object initializes the app when the module loads
+@OptIn(ExperimentalComposeUiApi::class)
+object AppInitializer {
+    init {
+        val root = document.getElementById("root")
+        if (root != null) {
+            ComposeViewport(viewportContainer = root) {
+                AppWithViewModel()
+            }
+        }
+    }
+}
+
+
+
+
 
 
 
