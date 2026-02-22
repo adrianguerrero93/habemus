@@ -55,10 +55,38 @@
         <div class="loader">
             <div class="spinner"></div>
             <div>Inicializando Calculadora 714...</div>
-            <div class="version">v3.3 - JS wrapper loader</div>
+            <div class="version">v3.9 - Forcing module execution</div>
         </div>
     </div>
-    <script type="module" src="app-loader.js"></script>
+    <script type="module">
+        console.log('[inline] Loading WASM module');
+        
+        import('./calculadora.js').then((module) => {
+            console.log('[inline] WASM loaded, module keys:', Object.keys(module).slice(0, 5));
+            
+            // Force Kotlin initialization by calling _initialize
+            if (typeof module._initialize === 'function') {
+                console.log('🔥 Calling module._initialize()');
+                module._initialize();
+            }
+            
+            // Wait for Kotlin code to assign initializeCompose
+            setTimeout(() => {
+                if (typeof window.initializeCompose === 'function') {
+                    console.log('✅ Found initializeCompose, calling it');
+                    window.initializeCompose();
+                } else if (typeof globalThis.initializeCompose === 'function') {
+                    console.log('✅ Found globalThis.initializeCompose, calling it');
+                    globalThis.initializeCompose();
+                } else {
+                    console.log('⚠️ initializeCompose not found');
+                    console.log('window.initializeCompose:', typeof window.initializeCompose);
+                }
+            }, 500);
+        }).catch(err => {
+            console.error('[inline] Load error:', err);
+        });
+    </script>
 </body>
 </html>
 
