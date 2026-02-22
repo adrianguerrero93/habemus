@@ -28,6 +28,9 @@ fun generateOrderSummary(cartItems: List<CartItem>, isRetail: Boolean): String {
     if (cartItems.isEmpty()) return "Carrito vacío"
     
     val lines = mutableListOf<String>()
+    lines.add("Resumen pedido:")
+    lines.add("")
+    
     var total = 0.0
     
     cartItems.forEach { item ->
