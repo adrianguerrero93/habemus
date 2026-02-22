@@ -9,48 +9,42 @@ external object console {
     fun log(message: String)
 }
 
-// This function will be called by the WASM runtime automatically on module load
-// But we also export it so HTML can call it manually if needed
-fun onWasmLoaded() {
-    console.log("🔥 onWasmLoaded() called by WASM runtime")
+object WasmApp {
+    init {
+        console.log("🔥 WASM module loaded, scheduling initialization...")
+        
+        // Schedule initialization after DOM is ready
+        window.setTimeout(
+            { 
+                initializeApp()
+                null 
+            },
+            100
+        )
+    }
     
-    // Check if root exists immediately
-    val rootImmediate = document.getElementById("root")
-    console.log("📍 Root element immediately: ${if (rootImmediate != null) "FOUND" else "NOT FOUND"}")
-    
-    // Schedule initialization after a brief delay
-    window.setTimeout(
-        { 
-            initializeApp()
-            null 
-        },
-        100
-    )
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-private fun initializeApp() {
-    console.log("⏱️ initializeApp() called after setTimeout")
-    
-    val root = document.getElementById("root")
-    console.log("📍 Root element in initializeApp: ${if (root != null) "FOUND" else "NOT FOUND"}")
-    
-    if (root != null) {
-        try {
-            console.log("🎨 Creating ComposeViewport...")
-            ComposeViewport(viewportContainer = root) {
-                AppWithViewModel()
+    @OptIn(ExperimentalComposeUiApi::class)
+    private fun initializeApp() {
+        console.log("⏱️ initializeApp() called")
+        
+        val root = document.getElementById("root")
+        console.log("📍 Root element found: ${root != null}")
+        
+        if (root != null) {
+            try {
+                console.log("🎨 Creating ComposeViewport...")
+                // Clear loader
+                root.innerHTML = ""
+                ComposeViewport(viewportContainer = root) {
+                    AppWithViewModel()
+                }
+                console.log("✅ App rendered!")
+            } catch (e: Throwable) {
+                console.log("❌ Error: ${e.message}")
             }
-            console.log("✅ ComposeViewport created successfully")
-        } catch (e: Throwable) {
-            console.log("❌ Error creating ComposeViewport: ${e.message}")
         }
-    } else {
-        console.log("❌ Cannot initialize: root element not found")
     }
 }
-
-// No main() function - let WASM auto-initialize
 
 
 
