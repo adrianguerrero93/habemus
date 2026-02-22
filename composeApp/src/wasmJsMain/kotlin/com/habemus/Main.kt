@@ -9,22 +9,20 @@ external object console {
     fun log(message: String)
 }
 
-// Singleton that initializes on creation
-object AppInitializer {
-    init {
-        console.log("🔥 Kotlin module loaded, initializing...")
-        
-        window.setTimeout({
-            initApp()
-            null
-        }, 100)
+class Calculadora {
+    companion object {
+        init {
+            console.log("🔥 Calculadora companion object initialized")
+            window.setTimeout({
+                initApp()
+                null
+            }, 100)
+        }
     }
 }
 
-// Trigger initialization by accessing the object
-fun forceInit() {
-    AppInitializer.toString() // Force access
-}
+// Force initialization by creating an instance
+val app = Calculadora()
 
 @OptIn(ExperimentalComposeUiApi::class)
 private fun initApp() {
