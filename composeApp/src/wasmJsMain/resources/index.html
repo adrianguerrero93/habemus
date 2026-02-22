@@ -36,5 +36,17 @@
         <div class="loader">Cargando Calculadora...</div>
     </div>
     <script defer src="calculadora.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if (typeof globalThis.composeApp?.main === 'function') {
+                    globalThis.composeApp.main();
+                    console.log('✅ App initialized');
+                } else {
+                    console.log('⚠️ App not ready yet');
+                }
+            }, 500);
+        });
+    </script>
 </body>
 </html>
