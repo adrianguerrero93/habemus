@@ -1,17 +1,35 @@
 package com.habemus
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlin.math.roundToInt
+import ar.habemosbar.sales.domain.model.CartItem
+import ar.habemosbar.sales.domain.model.CustomerType
+import ar.habemosbar.sales.domain.model.Product
 
 external fun encodeURIComponent(uri: String): String
 
@@ -24,7 +42,7 @@ fun formatPrice(value: Double): String {
     }
 }
 
-fun generateOrderSummary(cartItems: List<CartItem>, isRetail: Boolean): String {
+fun generateOrderSummary(cartItems: List<CartItem>, customerType: CustomerType): String {
     if (cartItems.isEmpty()) return "Carrito vacío"
     
     val lines = mutableListOf<String>()
@@ -34,14 +52,14 @@ fun generateOrderSummary(cartItems: List<CartItem>, isRetail: Boolean): String {
     var total = 0.0
     
     cartItems.forEach { item ->
-        val price = if (isRetail) item.product.priceRetail else item.product.priceCommerce
-        val subtotal = price * item.quantity
+        val subtotal = item.getSubtotal(customerType)
         total += subtotal
         
         val productName = item.product.name
             .replace("LATA BAUM ", "")
             .replace(" 473 CC", "")
         
+        val price = item.product.getPrice(customerType)
         lines.add("${productName}: \$${formatPrice(price)} × ${item.quantity} = \$${formatPrice(subtotal)}")
     }
     
@@ -85,7 +103,7 @@ val PRODUCTS = listOf(
 @Composable
 fun AppWithViewModel() {
     val cart = remember { mutableStateOf<Map<Long, CartItem>>(emptyMap()) }
-    val isRetail = remember { mutableStateOf(false) } // Comercio por defecto
+    val customerType = remember { mutableStateOf(CustomerType.COMERCIO) }
     
     Box(
         modifier = Modifier
@@ -130,17 +148,17 @@ fun AppWithViewModel() {
             ) {
                 Text("Tipo de cliente:", fontSize = 14.sp)
                 Button(
-                    onClick = { isRetail.value = false },
+                    onClick = { customerType.value = CustomerType.COMERCIO },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (!isRetail.value) Color(0xFF003D99) else Color.LightGray
+                        containerColor = if (customerType.value == CustomerType.COMERCIO) Color(0xFF003D99) else Color.LightGray
                     )
                 ) {
                     Text("Comercio", color = Color.White)
                 }
                 Button(
-                    onClick = { isRetail.value = true },
+                    onClick = { customerType.value = CustomerType.CONSUMIDOR_FINAL },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isRetail.value) Color(0xFF003D99) else Color.LightGray
+                        containerColor = if (customerType.value == CustomerType.CONSUMIDOR_FINAL) Color(0xFF003D99) else Color.LightGray
                     )
                 ) {
                     Text("Consumidor Final", color = Color.White)
@@ -158,7 +176,7 @@ fun AppWithViewModel() {
                 items(PRODUCTS) { product ->
                     ProductRow(
                         product = product,
-                        isRetail = isRetail.value,
+                        customerType = customerType.value,
                         currentQty = cart.value[product.id]?.quantity ?: 0,
                         onQtyChange = { newQty ->
                             val newCart = cart.value.toMutableMap()
@@ -174,10 +192,7 @@ fun AppWithViewModel() {
             }
             
             // Totals
-            val total = cart.value.values.sumOf { item ->
-                val price = if (isRetail.value) item.product.priceRetail else item.product.priceCommerce
-                price * item.quantity
-            }
+            val total = cart.value.values.sumOf { it.getSubtotal(customerType.value) }
             val itemCount = cart.value.values.sumOf { it.quantity }
             
             Surface(
@@ -206,7 +221,7 @@ fun AppWithViewModel() {
                             Button(
                                 onClick = {
                                     val cartList = cart.value.values.sortedBy { it.product.name }
-                                    val summary = generateOrderSummary(cartList, isRetail.value)
+                                    val summary = generateOrderSummary(cartList, customerType.value)
                                     shareToWhatsApp(summary)
                                 },
                                 enabled = cart.value.isNotEmpty(),
@@ -234,11 +249,11 @@ fun AppWithViewModel() {
 @Composable
 fun ProductRow(
     product: Product,
-    isRetail: Boolean,
+    customerType: CustomerType,
     currentQty: Int,
     onQtyChange: (Int) -> Unit
 ) {
-    val price = if (isRetail) product.priceRetail else product.priceCommerce
+    val price = product.getPrice(customerType)
     
     Row(
         modifier = Modifier
