@@ -55,14 +55,14 @@
         <div class="loader">
             <div class="spinner"></div>
             <div>Inicializando Calculadora 714...</div>
-            <div class="version">v4.0 - Fixed webpack publicPath</div>
+            <div class="version">v4.1 - globalThis webpack path</div>
         </div>
     </div>
     <script type="module">
         console.log('[inline] Setting webpack publicPath');
         
         // Set webpack public path before loading module
-        __webpack_public_path__ = '/habemus/';
+        globalThis.__webpack_public_path__ = '/habemus/';
         
         console.log('[inline] Loading WASM module');
         
