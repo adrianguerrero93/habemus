@@ -1,7 +1,7 @@
 {
-  "name": "Calculadora 714 - Habemus Bar",
+  "name": "Calculadora 714 - Habemus Bar SRL",
   "short_name": "Calculadora 714",
-  "description": "Calculadora de ventas para Habemus Bar Distribuidor",
+  "description": "Calculadora de ventas para Habemus Bar SRL - Distribución",
   "start_url": "/habemus/",
   "scope": "/habemus/",
   "display": "standalone",
@@ -10,24 +10,24 @@
   "background_color": "#FFFFFF",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23003D99' width='192' height='192'/><text x='50%' y='50%' font-size='80' fill='white' text-anchor='middle' dy='.3em' font-weight='bold'>714</text></svg>",
+      "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23003D99' width='192' height='192'/><text x='50%' y='50%' font-size='80' fill='white' text-anchor='middle' dy='.3em' font-weight='bold'>714</text></svg>",
+      "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "maskable"
     }
   ],
   "categories": ["business", "productivity"],
   "screenshots": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><rect fill='%23003D99' width='540' height='720'/><text x='270' y='360' font-size='60' fill='white' text-anchor='middle' dy='.3em'>Calculadora 714</text></svg>",
+      "src": "icon-192.png",
       "sizes": "540x720",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "form_factor": "narrow"
     }
   ]

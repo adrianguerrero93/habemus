@@ -75,7 +75,7 @@ fun AppWithViewModel() {
                         style = MaterialTheme.typography.headlineLarge
                     )
                     Text(
-                        "Habemus Bar - Distribuidor",
+                        "Habemus Bar SRL - Distribución",
                         color = Color.White,
                         fontSize = 12.sp
                     )
