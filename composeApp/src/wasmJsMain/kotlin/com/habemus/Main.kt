@@ -29,8 +29,16 @@ fun initializeCompose() {
     }
 }
 
-// Module-level initialization via js()
-val _init: String = js("(window.initializeCompose = () => com.habemus.initializeCompose(), console.log('Module loaded'), 'ok')")
+// Self-executing assignment
+val hack: String = js("""
+(function() {
+    var fn = function() { com.habemus.initializeCompose(); };
+    window.initializeCompose = fn;
+    window.__habemusReady = true;
+    console.log('🔥 Kotlin module: initializeCompose ready');
+    return 'ready';
+})()
+""")
 
 
 
