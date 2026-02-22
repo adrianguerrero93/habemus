@@ -1,12 +1,11 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
 }
 
-@OptIn(ExperimentalWasmDsl::class)
+
 kotlin {
     androidTarget {
         compilerOptions {
@@ -19,7 +18,7 @@ kotlin {
     
     jvm()
     
-    wasmJs {
+    js(IR) {
         browser()
         binaries.executable()
     }

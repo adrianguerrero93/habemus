@@ -9,7 +9,6 @@ plugins {
     alias(libs.plugins.composeCompiler)
 }
 
-@OptIn(ExperimentalWasmDsl::class)
 kotlin {
     androidTarget {
         compilerOptions {
@@ -27,7 +26,7 @@ kotlin {
         }
     }
     
-    wasmJs {
+    js(IR) {
         browser {
             commonWebpackConfig {
                 outputFileName = "calculadora.js"

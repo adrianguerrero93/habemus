@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora 714</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: sans-serif;
+            background: linear-gradient(135deg, #003D99, #0066cc);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.2);
+            padding: 20px;
+            border-radius: 8px;
+        }
+        #root {
+            min-height: 500px;
+            border: 2px solid white;
+            padding: 20px;
+            border-radius: 4px;
+        }
+        .info {
+            font-size: 12px;
+            margin-top: 20px;
+            opacity: 0.8;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora 714 - Habemus Bar</h1>
+        <div id="root" class="loading">Cargando aplicación...</div>
+        <div class="info">
+            <p>v5.0 - Kotlin/JS Direct Load</p>
+            <p>Abre DevTools (F12) para ver los logs</p>
+        </div>
+    </div>
+
+    <script>
+        window.__webpack_public_path__ = '/habemus/';
+        console.log('[init] Public path set');
+    </script>
+
+    <!-- Load the Kotlin/JS bundle -->
+    <script src="calculadora.js" onload="onBundleLoaded()"></script>
+
+    <script>
+        function onBundleLoaded() {
+            console.log('[onload] Bundle script loaded');
+            console.log('[onload] window.composeApp:', window.composeApp);
+            
+            // Inspect all exports
+            const appKeys = window.composeApp ? Object.keys(window.composeApp) : [];
+            console.log('[onload] composeApp keys:', appKeys);
+            
+            // List all globals added by bundle
+            const newGlobals = Object.keys(window).filter(k => 
+                !k.startsWith('webkit') && 
+                !k.startsWith('on') && 
+                k.length < 30
+            );
+            console.log('[onload] window globals (sample):', newGlobals.slice(-20));
+            
+            // Try to find and call init functions
+            setTimeout(() => {
+                console.log('[delay] Checking for entry points...');
+                
+                // List what's available
+                if (window.composeApp) {
+                    const funcs = appKeys.filter(k => typeof window.composeApp[k] === 'function');
+                    console.log('[delay] Functions in composeApp:', funcs);
+                    
+                    // Try common names
+                    const tryFunctions = [
+                        'main', 'init', 'initialize', 'start', 
+                        'initializeCompose', 'setupWindow', 'HabemosApp'
+                    ];
+                    
+                    for (const fname of tryFunctions) {
+                        if (typeof window.composeApp[fname] === 'function') {
+                            console.log(`[delay] Found ${fname}, calling it...`);
+                            try {
+                                window.composeApp[fname]();
+                                console.log(`✅ ${fname}() executed`);
+                                return;
+                            } catch (e) {
+                                console.log(`❌ ${fname}() failed:`, e.message);
+                            }
+                        }
+                    }
+                }
+                
+                console.log('[delay] ⚠️ No known entry point found');
+                document.getElementById('root').innerHTML = '<p>⚠️ Failed to initialize app</p><pre>' + 
+                    'composeApp available: ' + (window.composeApp ? 'YES' : 'NO') + '\n' +
+                    'Keys: ' + appKeys.join(', ') + 
+                    '</pre>';
+            }, 500);
+        }
+    </script>
+</body>
+</html>
