@@ -1,35 +1,93 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora 714 - Habemus</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Calculadora 714 - Habemus Bar Distribuidor">
+    <meta name="theme-color" content="#003D99">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Calculadora 714">
+    <title>Calculadora 714</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23003D99' width='192' height='192'/><text x='50%' y='50%' font-size='80' fill='white' text-anchor='middle' dy='.3em' font-weight='bold'>714</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23003D99' width='180' height='180' rx='40'/><text x='90' y='90' font-size='70' fill='white' text-anchor='middle' dy='.3em' font-weight='bold'>714</text></svg>">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { 
             width: 100%; 
             height: 100%;
             background: white;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         #root { 
             width: 100%;
             height: 100%;
             display: flex;
         }
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #003D99;
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            z-index: 1000;
+            display: none;
+            font-size: 14px;
+        }
+        .install-prompt.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <div id="root"></div>
+    <div id="installPrompt" class="install-prompt">
+        <p>¿Instalar como app?</p>
+        <button id="installBtn" style="background: white; color: #003D99; padding: 8px 16px; border: none; border-radius: 4px; margin-top: 8px; cursor: pointer;">Instalar</button>
+    </div>
     
     <script>
-        window.__webpack_public_path__ = '/';
+        window.__webpack_public_path__ = '/habemus/';
+        
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/habemus/sw.js').then(reg => {
+                console.log('[PWA] Service worker registered');
+            }).catch(err => {
+                console.log('[PWA] Service worker registration failed:', err);
+            });
+        }
+        
+        // PWA install prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installPrompt').classList.add('show');
+        });
+        
+        document.getElementById('installBtn')?.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log('[PWA] User choice:', outcome);
+                deferredPrompt = null;
+                document.getElementById('installPrompt').classList.remove('show');
+            }
+        });
     </script>
+    
     <script src="calculadora.js"></script>
     <script>
-        // Call main() after a short delay to ensure bundle is fully loaded
         setTimeout(function() {
             console.log('[app] Calling main()');
             if (window.com && window.com.habemus && window.com.habemus.main) {
