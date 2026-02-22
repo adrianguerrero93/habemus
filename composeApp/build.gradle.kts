@@ -27,18 +27,6 @@ kotlin {
         }
     }
     
-    wasmJs {
-        browser {
-            commonWebpackConfig {
-                outputFileName = "calculadora.js"
-            }
-        }
-        binaries.executable()
-        compilerOptions {
-            allWarningsAsErrors.set(false)
-        }
-    }
-    
     sourceSets {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
