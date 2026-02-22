@@ -4,20 +4,26 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import kotlinx.browser.document
 import kotlinx.browser.window
-import kotlin.js.JsExport
 
 external object console {
     fun log(message: String)
 }
 
-@JsExport
-fun startApp() {
-    console.log("🔥 startApp() called!")
-    
-    window.setTimeout({
-        initApp()
-        null
-    }, 100)
+// Singleton that initializes on creation
+object AppInitializer {
+    init {
+        console.log("🔥 Kotlin module loaded, initializing...")
+        
+        window.setTimeout({
+            initApp()
+            null
+        }, 100)
+    }
+}
+
+// Trigger initialization by accessing the object
+fun forceInit() {
+    AppInitializer.toString() // Force access
 }
 
 @OptIn(ExperimentalComposeUiApi::class)

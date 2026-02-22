@@ -55,39 +55,10 @@
         <div class="loader">
             <div class="spinner"></div>
             <div>Inicializando Calculadora 714...</div>
-            <div class="version">v2.6 - JsExport</div>
+            <div class="version">v2.7 - module-level init</div>
         </div>
     </div>
     <script defer src="calculadora.js"></script>
-    <script defer>
-        console.log('📝 HTML loaded, waiting for startApp...');
-        
-        let attempts = 0;
-        const checkModule = setInterval(() => {
-            attempts++;
-            
-            // Check for JsExport function
-            if (globalThis.com && globalThis.com.habemus && 
-                typeof globalThis.com.habemus.startApp === 'function') {
-                clearInterval(checkModule);
-                console.log('✅ Found com.habemus.startApp, calling it...');
-                globalThis.com.habemus.startApp();
-                return;
-            }
-            
-            // Try other common patterns
-            if (attempts === 1) {
-                console.log('Searching for exports in globalThis...');
-                const keys = Object.keys(globalThis).filter(k => !k.startsWith('webkit') && k.length < 20);
-                console.log('Found:', keys.slice(0, 30));
-            }
-            
-            if (attempts > 50) {
-                clearInterval(checkModule);
-                console.error('❌ Timeout: Could not find startApp after 5 seconds');
-            }
-        }, 100);
-    </script>
 </body>
 </html>
 
